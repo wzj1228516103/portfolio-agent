@@ -1,6 +1,12 @@
 # Portfolio Agent
 
-一个可自托管的作品集与文档问答服务。它使用 Pi Agent Core 和 DeepSeek，支持 Markdown 检索、来源引用、多轮会话，以及 JSON 或 Server-Sent Events（SSE）响应。仓库自带虚构的作品集语料。
+一个可自托管的作品集与文档问答服务，使用 Pi Agent Core 和 DeepSeek，支持 BM25 检索、来源引用、多轮会话，以及 JSON 或 Server-Sent Events（SSE）响应。
+
+[快速开始](#本地运行) · [接口一览](#http-接口) · [接入作品集](#接入公开作品集) · [版本发布](../../releases/latest)
+
+![终端向 Portfolio Agent 询问虚构项目的设计职责，回答附上资料来源](screenshots/terminal.png)
+
+演示取自本地服务的终端输出和 HTTP 响应，使用仓库里的[虚构作品集](public-rag/example-profile.md)和模拟模型响应。
 
 ## 本地运行
 
@@ -11,9 +17,35 @@ npm ci
 cp .env.example .env
 ```
 
-Windows PowerShell 用 `Copy-Item .env.example .env`。在 `.env` 中填写自己的 `DEEPSEEK_API_KEY`，然后运行 `npm start`。服务默认监听 `127.0.0.1:8787`，`npm run chat` 可以打开终端对话。试着问「岸线协作台里，设计师负责什么？」
+Windows PowerShell 用 `Copy-Item .env.example .env`。在 `.env` 填写自己的 `DEEPSEEK_API_KEY`，然后运行 `npm start`。服务默认监听 `127.0.0.1:8787`。另开一个终端，运行 `npm run chat` 开始多轮对话，或直接传入一个问题。
+
+```sh
+npm run chat -- "岸线协作台里，设计师负责什么？"
+```
 
 可以通过 `KNOWLEDGE_DIR` 指向你自己的资料目录。检索支持 Markdown、文本、HTML 和 CSV。已检索的片段会随问题发给配置的模型服务。
+
+## 检索和流式输出
+
+**检索结果**显示命中片段的来源路径、标题和 BM25 分数。下图截取了示例查询的一条结果。
+
+![知识库搜索接口返回岸线协作台所在的文件、标题、相关度分数和文本片段](screenshots/knowledge-search.png)
+
+**流式回答**通过 `delta` 分段发送文本，通过 `done` 标记回答完成。下图截取了实际事件的主要字段。
+
+![SSE 接口返回两条 delta 和一条 done 事件](screenshots/streaming.png)
+
+## 请求流程
+
+```mermaid
+flowchart LR
+    Client["终端或网页"] --> Agent["Portfolio Agent"]
+    Docs["Markdown、文本等资料"] --> Index["BM25 索引"]
+    Index --> Agent
+    Agent --> Model["DeepSeek"]
+    Model --> Agent
+    Agent --> Reply["JSON 或 SSE 响应"]
+```
 
 ## HTTP 接口
 
@@ -39,6 +71,6 @@ Windows PowerShell 用 `Copy-Item .env.example .env`。在 `.env` 中填写自�
 
 ## 开发
 
-`npm run typecheck` 检查 TypeScript。 `npm test` 离线验证公共访问、会话归属以及 SQLite 配额。
+`npm run typecheck` 检查 TypeScript。`npm test` 离线验证公共访问、会话归属以及 SQLite 配额。
 
 [MIT 许可证](LICENSE)
