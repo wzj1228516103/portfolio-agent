@@ -1,5 +1,7 @@
 # Portfolio Agent
 
+作品集前端和 Agent 现已整合到 [Resume Portfolio](https://github.com/wzj1228516103/resume-portfolio)，统一启动说明和当前源码见新项目的 [`agent/` 目录](https://github.com/wzj1228516103/resume-portfolio/tree/main/agent)。
+
 一个可自托管的作品集与文档问答服务，使用 Pi Agent Core 和 DeepSeek，支持 BM25 检索、来源引用、多轮会话，以及 JSON 或 Server-Sent Events（SSE）响应。
 
 [快速开始](#本地运行) · [接口一览](#http-接口) · [接入作品集](#接入公开作品集) · [版本发布](../../releases/latest)
